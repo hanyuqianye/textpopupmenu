@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: org.casaburo.utils.textPopupMenu
-OpenIDE-Module-Implementation-Version: 6
-OpenIDE-Module-Install: org/casaburo/utils/textPopupMenu/Installer.class
-OpenIDE-Module-Layer: org/casaburo/utils/textPopupMenu/layer.xml
-OpenIDE-Module-Localizing-Bundle: org/casaburo/utils/textPopupMenu/Bundle.properties
-
