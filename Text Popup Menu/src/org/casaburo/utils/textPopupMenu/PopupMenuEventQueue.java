@@ -35,10 +35,9 @@ import org.openide.util.NbBundle;
  *
  */
 class PopupMenuEventQueue extends EventQueue {
-    
+
 
     public JPopupMenu popup;
-    // JTable table;
     public BasicAction cut, copy, paste, selectAll;
     private final String cutString;
     private final String CUT_ICON_PATH;
@@ -52,11 +51,10 @@ class PopupMenuEventQueue extends EventQueue {
     private final ResourceBundle bundle;
 
     PopupMenuEventQueue() {
-        //createPopupMenu();
         cutString = NbBundle.getMessage(org.openide.actions.CutAction.class, "Cut").replace("&", "");
         CUT_ICON_PATH = "org/openide/resources/actions/cut.gif";
         cutIcon = (ImageUtilities.loadImageIcon(CUT_ICON_PATH, true));
-        
+
         copyString = NbBundle.getMessage(org.openide.actions.CopyAction.class, "Copy").replace("&", "");
         COPY_ICON_PATH = "org/openide/resources/actions/copy.gif";
         copyIcon = (ImageUtilities.loadImageIcon(COPY_ICON_PATH, true));
@@ -69,7 +67,7 @@ class PopupMenuEventQueue extends EventQueue {
 
     }
 
-    public void createPopupMenu(JTextComponent text) {
+    public void createPopupMenu(JTextComponent textComponent) {
 
         //TODO: completare con l'internazionalizzazione del comando Select All
 
@@ -77,11 +75,11 @@ class PopupMenuEventQueue extends EventQueue {
         copy = new PopCopyAction(copyString, copyIcon);//(messages.getString("CopyString"), null);
         paste = new PopPasteAction(pasteString, pasteIcon);//(messages.getString("PasteString"),null);
         selectAll = new PopSelectAllAction(bundle.getString("SelectAllString"), null);
-        cut.setTextComponent(text);
-        copy.setTextComponent(text);
-        paste.setTextComponent(text);
-        selectAll.setTextComponent(text);
-        
+        cut.setTextComponent(textComponent);
+        copy.setTextComponent(textComponent);
+        paste.setTextComponent(textComponent);
+        selectAll.setTextComponent(textComponent);
+
         popup = new JPopupMenu();
         popup.add(cut);
         popup.add(copy);
@@ -109,15 +107,15 @@ class PopupMenuEventQueue extends EventQueue {
         if (!(me.getSource() instanceof Component)) {
             return;
         }
-        Component comp = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
-        if (!(comp instanceof JTextComponent)) {
+        Component component = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
+        if (!(component instanceof JTextComponent)) {
             return;
         }
         if (MenuSelectionManager.defaultManager().getSelectedPath().length > 0) {
             return;
         }
-        comp.requestFocus(); //Thanks to wsc719@yahoo.com.cn for this contribution
-        createPopupMenu((JTextComponent) comp);
+        component.requestFocus(); //Thanks to wsc719@yahoo.com.cn for this contribution
+        createPopupMenu((JTextComponent) component);
         showPopup((Component) me.getSource(), me);
     }
 }
