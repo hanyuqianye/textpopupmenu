@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
 
 /**
  * how to use: it is enabled adding the following code row into your own code:
@@ -35,7 +36,6 @@ import org.openide.util.NbBundle;
  *
  */
 class PopupMenuEventQueue extends EventQueue {
-
 
     public JPopupMenu popup;
     public BasicAction cut, copy, paste, selectAll;
@@ -49,6 +49,7 @@ class PopupMenuEventQueue extends EventQueue {
     private final String PASTE_ICON_PATH;
     private final ImageIcon pasteIcon;
     private final ResourceBundle bundle;
+    private ActionMap actionMap;
 
     PopupMenuEventQueue() {
         cutString = NbBundle.getMessage(org.openide.actions.CutAction.class, "Cut").replace("&", "");
@@ -97,17 +98,21 @@ class PopupMenuEventQueue extends EventQueue {
     @Override
     protected void dispatchEvent(AWTEvent event) {
         super.dispatchEvent(event);
+
         if (!(event instanceof MouseEvent)) {
             return;
         }
         MouseEvent me = (MouseEvent) event;
+        Component component = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
+       actionMap=retrieveTopComponentOf(component).getActionMap();
+
+
         if (!me.isPopupTrigger()) {
             return;
         }
         if (!(me.getSource() instanceof Component)) {
             return;
         }
-        Component component = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
         if (!(component instanceof JTextComponent)) {
             return;
         }
@@ -118,6 +123,13 @@ class PopupMenuEventQueue extends EventQueue {
         createPopupMenu((JTextComponent) component);
         showPopup((Component) me.getSource(), me);
     }
+
+    private TopComponent retrieveTopComponentOf(Component c) {
+        TopComponent tc = null;
+        tc = (TopComponent) SwingUtilities.getAncestorOfClass(org.openide.windows.TopComponent.class, c);
+
+
+        return tc;
+        //     TODO get TopComponent tc related ActionMap and link actions to the Edit menu
+          }
 }
-
-
