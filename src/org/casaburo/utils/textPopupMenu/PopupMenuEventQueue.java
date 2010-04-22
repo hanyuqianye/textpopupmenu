@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
+import org.openide.windows.TopComponent;
 
 /**
  * how to use: it is enabled adding the following code row into your own code:
@@ -35,10 +36,8 @@ import org.openide.util.NbBundle;
  *
  */
 class PopupMenuEventQueue extends EventQueue {
-    
 
     public JPopupMenu popup;
-    // JTable table;
     public BasicAction cut, copy, paste, selectAll;
     private final String cutString;
     private final String CUT_ICON_PATH;
@@ -50,13 +49,13 @@ class PopupMenuEventQueue extends EventQueue {
     private final String PASTE_ICON_PATH;
     private final ImageIcon pasteIcon;
     private final ResourceBundle bundle;
+    private ActionMap actionMap;
 
     PopupMenuEventQueue() {
-        //createPopupMenu();
         cutString = NbBundle.getMessage(org.openide.actions.CutAction.class, "Cut").replace("&", "");
         CUT_ICON_PATH = "org/openide/resources/actions/cut.gif";
         cutIcon = (ImageUtilities.loadImageIcon(CUT_ICON_PATH, true));
-        
+
         copyString = NbBundle.getMessage(org.openide.actions.CopyAction.class, "Copy").replace("&", "");
         COPY_ICON_PATH = "org/openide/resources/actions/copy.gif";
         copyIcon = (ImageUtilities.loadImageIcon(COPY_ICON_PATH, true));
@@ -69,7 +68,7 @@ class PopupMenuEventQueue extends EventQueue {
 
     }
 
-    public void createPopupMenu(JTextComponent text) {
+    public void createPopupMenu(JTextComponent textComponent) {
 
         //TODO: completare con l'internazionalizzazione del comando Select All
 
@@ -77,11 +76,11 @@ class PopupMenuEventQueue extends EventQueue {
         copy = new PopCopyAction(copyString, copyIcon);//(messages.getString("CopyString"), null);
         paste = new PopPasteAction(pasteString, pasteIcon);//(messages.getString("PasteString"),null);
         selectAll = new PopSelectAllAction(bundle.getString("SelectAllString"), null);
-        cut.setTextComponent(text);
-        copy.setTextComponent(text);
-        paste.setTextComponent(text);
-        selectAll.setTextComponent(text);
-        
+        cut.setTextComponent(textComponent);
+        copy.setTextComponent(textComponent);
+        paste.setTextComponent(textComponent);
+        selectAll.setTextComponent(textComponent);
+
         popup = new JPopupMenu();
         popup.add(cut);
         popup.add(copy);
@@ -99,27 +98,38 @@ class PopupMenuEventQueue extends EventQueue {
     @Override
     protected void dispatchEvent(AWTEvent event) {
         super.dispatchEvent(event);
+
         if (!(event instanceof MouseEvent)) {
             return;
         }
         MouseEvent me = (MouseEvent) event;
+        Component component = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
+       actionMap=retrieveTopComponentOf(component).getActionMap();
+
+
         if (!me.isPopupTrigger()) {
             return;
         }
         if (!(me.getSource() instanceof Component)) {
             return;
         }
-        Component comp = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
-        if (!(comp instanceof JTextComponent)) {
+        if (!(component instanceof JTextComponent)) {
             return;
         }
         if (MenuSelectionManager.defaultManager().getSelectedPath().length > 0) {
             return;
         }
-        comp.requestFocus(); //Thanks to wsc719@yahoo.com.cn for this contribution
-        createPopupMenu((JTextComponent) comp);
+        component.requestFocus(); //Thanks to wsc719@yahoo.com.cn for this contribution
+        createPopupMenu((JTextComponent) component);
         showPopup((Component) me.getSource(), me);
     }
+
+    private TopComponent retrieveTopComponentOf(Component c) {
+        TopComponent tc = null;
+        tc = (TopComponent) SwingUtilities.getAncestorOfClass(org.openide.windows.TopComponent.class, c);
+
+
+        return tc;
+        //     TODO get TopComponent tc related ActionMap and link actions to the Edit menu
+          }
 }
-
-
