@@ -18,30 +18,26 @@
 // </editor-fold>
 package org.casaburo.utils.textPopupMenu;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
-class PopPasteAction extends BasicAction {
+ class PopDeleteAction extends BasicAction {
 
-    public PopPasteAction(String text, Icon icon) {
+    public PopDeleteAction(String text, Icon icon) {
         super(text, icon);
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl V"));
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE,0));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        comp.paste();
+        comp.replaceSelection("");
     }
 
     @Override
     public boolean isEnabled() {
-        Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        return comp != null && comp.isEnabled() && comp.isEditable() && content.isDataFlavorSupported(DataFlavor.stringFlavor);
+        return comp != null && comp.isEditable() && comp.getSelectedText() != null;
     }
 }

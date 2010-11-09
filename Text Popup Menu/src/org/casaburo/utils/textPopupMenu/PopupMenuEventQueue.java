@@ -25,7 +25,6 @@ import javax.swing.*;
 import javax.swing.text.*;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
 
 /**
  * how to use: it is enabled adding the following code row into your own code:
@@ -38,7 +37,7 @@ import org.openide.windows.TopComponent;
 class PopupMenuEventQueue extends EventQueue {
 
     public JPopupMenu popup;
-    public BasicAction cut, copy, paste, selectAll;
+    public BasicAction cut, copy, paste, selectAll, delete;
     private final String cutString;
     private final String CUT_ICON_PATH;
     private final ImageIcon cutIcon;
@@ -48,6 +47,9 @@ class PopupMenuEventQueue extends EventQueue {
     private final String pasteString;
     private final String PASTE_ICON_PATH;
     private final ImageIcon pasteIcon;
+    private final String deleteString;
+    private final String DELETE_ICON_PATH;
+    private final ImageIcon deleteIcon;
     private final ResourceBundle bundle;
     private ActionMap actionMap;
 
@@ -64,6 +66,10 @@ class PopupMenuEventQueue extends EventQueue {
         PASTE_ICON_PATH = "org/openide/resources/actions/paste.gif";
         pasteIcon = (ImageUtilities.loadImageIcon(PASTE_ICON_PATH, true));
 
+        deleteString = NbBundle.getMessage(org.openide.actions.DeleteAction.class, "Delete").replace("&", "");
+        DELETE_ICON_PATH = "org/openide/resources/actions/delete.gif";
+        deleteIcon = (ImageUtilities.loadImageIcon(DELETE_ICON_PATH, true));
+
         bundle = ResourceBundle.getBundle("org/casaburo/utils/textPopupMenu/resources/PopUpBundle");
 
     }
@@ -76,15 +82,19 @@ class PopupMenuEventQueue extends EventQueue {
         copy = new PopCopyAction(copyString, copyIcon);//(messages.getString("CopyString"), null);
         paste = new PopPasteAction(pasteString, pasteIcon);//(messages.getString("PasteString"),null);
         selectAll = new PopSelectAllAction(bundle.getString("SelectAllString"), null);
+        delete= new PopDeleteAction(deleteString, deleteIcon);//(messages.getString("DeleteString"),null);
         cut.setTextComponent(textComponent);
         copy.setTextComponent(textComponent);
         paste.setTextComponent(textComponent);
         selectAll.setTextComponent(textComponent);
+        delete.setTextComponent(textComponent);
+
 
         popup = new JPopupMenu();
         popup.add(cut);
         popup.add(copy);
         popup.add(paste);
+        popup.add(delete);
         popup.addSeparator();
         popup.add(selectAll);
     }
@@ -103,13 +113,10 @@ class PopupMenuEventQueue extends EventQueue {
             return;
         }
         MouseEvent me = (MouseEvent) event;
-        Component component = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
-       actionMap=retrieveTopComponentOf(component).getActionMap();
-
-
         if (!me.isPopupTrigger()) {
             return;
-        }
+        } 
+        Component component = SwingUtilities.getDeepestComponentAt((Component) me.getSource(), me.getX(), me.getY());
         if (!(me.getSource() instanceof Component)) {
             return;
         }
@@ -122,14 +129,5 @@ class PopupMenuEventQueue extends EventQueue {
         component.requestFocus(); //Thanks to wsc719@yahoo.com.cn for this contribution
         createPopupMenu((JTextComponent) component);
         showPopup((Component) me.getSource(), me);
-    }
-
-    private TopComponent retrieveTopComponentOf(Component c) {
-        TopComponent tc = null;
-        tc = (TopComponent) SwingUtilities.getAncestorOfClass(org.openide.windows.TopComponent.class, c);
-
-
-        return tc;
-        //     TODO get TopComponent tc related ActionMap and link actions to the Edit menu
-          }
+    }  
 }
