@@ -22,7 +22,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
